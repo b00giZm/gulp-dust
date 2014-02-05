@@ -7,13 +7,31 @@ it('should precompile Dust templates', function (cb) {
 	var stream = dust();
 
 	stream.on('data', function (file) {
-		assert.equal(file.relative, 'fixture.js');
-		assert(/fixture/.test(file.contents.toString()));
+		assert.equal(file.relative, 'fixture/fixture.js');
+		assert(/fixture\/fixture/.test(file.contents.toString()));
 		cb();
 	});
 
 	stream.write(new gutil.File({
-		path: 'fixture.html',
+		base: __dirname,
+		path: __dirname + '/fixture/fixture.html',
+		contents: new Buffer('*foo*')
+	}));
+});
+
+it('should support supplying custom name in a callback', function (cb) {
+	var stream = dust(function (file) {
+		return 'custom';
+	});
+
+	stream.on('data', function (file) {
+		assert(/custom/.test(file.contents.toString()));
+		cb();
+	});
+
+	stream.write(new gutil.File({
+		base: __dirname,
+		path: __dirname + '/fixture/fixture.html',
 		contents: new Buffer('*foo*')
 	}));
 });
